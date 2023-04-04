@@ -1,14 +1,14 @@
-const Dúvida = document.getElementById("Dúvida");
-const Conclusão = document.getElementById("Conclusão");
+const inputQuestion = document.getElementById("duvida");
+const result = document.getElementById("conclusao");
 
-Conclusão.addEventListener("keypress", (e) => {
-  if (Dúvida.value && e.key === "Enter") SendQuestion();
+inputQuestion.addEventListener("keypress", (e) => {
+  if (inputQuestion.value && e.key === "Enter") SendQuestion();
 });
 
-const OPENAI_API_KEY = "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";
+const OPENAI_API_KEY = "sk-mEiMSwhHT3pxKaIYaE9QT3BlbkFJiPraTreSFiRcv7MvQd7";
 
 function SendQuestion() {
-  var sQuestion = Dúvida.value;
+  var sQuestion = inputQuestion.value;
 
   fetch("https://api.openai.com/v1/completions", {
     method: "POST",
@@ -20,63 +20,36 @@ function SendQuestion() {
     body: JSON.stringify({
       model: "text-davinci-003",
       prompt: sQuestion,
-      max_tokens: 2048, // Tamanho
-      temperature: 0.5, // Criatividade 
+      max_tokens: 2048, // tamanho da resposta
+      temperature: 0.5, // criatividade na resposta
     }),
   })
     .then((response) => response.json())
     .then((json) => {
-      if (Conclusão.value) Conclusão.value += "\n";
+      if (result.value) result.value += "\n";
 
       if (json.error?.message) {
-        Conclusão.value += `Error: ${json.error.message}`;
+        result.value += `Error: ${json.error.message}`;
       } else if (json.choices?.[0].text) {
         var text = json.choices[0].text || "Sem resposta";
 
-        Conclusão.value += "Mestre: " + text;
+        result.value += "Chat GPT: " + text;
       }
 
-      Conclusão.scrollTop = Conclusão.scrollHeight;
+      result.scrollTop = result.scrollHeight;
     })
     .catch((error) => console.error("Error:", error))
     .finally(() => {
-      Conclusão.value = "";
-      Conclusão.disabled = false;
-      Conclusão.focus();
+      inputQuestion.value = "";
+      inputQuestion.disabled = false;
+      inputQuestion.focus();
     });
 
-  if (Conclusão.value) Conclusão.value += "\n\n\n";
+  if (result.value) result.value += "\n\n\n";
 
-  Dúvida.value += `Eu: ${sQuestion}`;
-  Conclusão.value = "Esperando resposta...";
-  Conclusão.disabled = true;
+  result.value += `Eu: ${sQuestion}`;
+  inputQuestion.value = "Esperando...";
+  inputQuestion.disabled = true;
 
-  Conclusão.scrollTop = Conclusão.scrollHeight;
-}
-
-let slideIndex = 1;
-showSlides(slideIndex);
-
-function plusSlides(n) {
-  showSlides(slideIndex += n);
-}
-
-function currentSlide(n) {
-  showSlides(slideIndex = n);
-}
-
-function showSlides(n) {
-  let i;
-  let slides = document.getElementsByClassName("mySlides");
-  let dots = document.getElementsByClassName("dot");
-  if (n > slides.length) {slideIndex = 1}    
-  if (n < 1) {slideIndex = slides.length}
-  for (i = 0; i < slides.length; i++) {
-    slides[i].style.display = "none";  
-  }
-  for (i = 0; i < dots.length; i++) {
-    dots[i].className = dots[i].className.replace(" active", "");
-  }
-  slides[slideIndex-1].style.display = "block";  
-  dots[slideIndex-1].className += " active";
+  result.scrollTop = result.scrollHeight;
 }
