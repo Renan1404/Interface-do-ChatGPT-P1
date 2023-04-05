@@ -3,16 +3,16 @@ const conclusao = document.getElementById("conclusao");
 
 duvida.addEventListener("keypress", (e) => {
   if (duvida.value && e.key === "Enter") {
-    SendQuestion();
+   SendQuestion();
   }
 });
 
-const OPENAI_API_KEY = "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";
+const OPENAI_API_KEY = "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";
 
-function SendQuestion() {
+const SendQuestion = async() => {
   var sQuestion = duvida.value;
 
-  fetch("https://api.openai.com/v1/completions", {
+  await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -20,25 +20,28 @@ function SendQuestion() {
       Authorization: "Bearer " + OPENAI_API_KEY,
     },
     body: JSON.stringify({
-      model: "text-davinci-003",
-      prompt: sQuestion,
+      model: "gpt-3.5-turbo",
+      messages:[{"role": "user", "content": sQuestion}],
       max_tokens: 2048, // Tamanho
-      temperature: 0.5, // Criatividade 
+      temperature: 1, // Criatividade 
     }),
   })
     .then((response) => response.json())
     .then((json) => {
+      //console.log(json);
       if (conclusao.value){
         conclusao.value += "\n";
       } 
 
-      if (json.error?.message) {
+      /*if (json.error?.message) {
         conclusao.value += `Error: ${json.error.message}`;
       } else if (json.choices?.[0].text) {
-        var text = json.choices[0].text || "Sem resposta";
-       conclusao.value += "Mestre: " + text;
+*/
+      var text = json.choices[0].message.content ;
+      console.log(text);
+      conclusao.value += "Mestre: " + text;
 
-      }
+    //}
 
       conclusao.scrollTop = conclusao.scrollHeight;
     })
@@ -50,10 +53,10 @@ function SendQuestion() {
     });
 
 
-    conclusao.value += `Eu: ${sQuestion} \n`;
+    /*conclusao.value += `Eu: ${sQuestion} \n`;
     conclusao.value += "Esperando resposta... \n";
-    conclusao.value += `${text}`;
-
+    conclusao.value += text;
+*/
     conclusao.scrollTop = conclusao.scrollHeight;
 
 
